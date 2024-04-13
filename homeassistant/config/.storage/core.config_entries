@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "core.config_entries",
+  "data": {
+    "entries": [
+      {
+        "entry_id": "841871e74407d4e358bcab76873ecf6d",
+        "version": 1,
+        "minor_version": 1,
+        "domain": "sun",
+        "title": "Sun",
+        "data": {},
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "import",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "efe17165c9d1bd1e879419ab317727c6",
+        "version": 1,
+        "minor_version": 1,
+        "domain": "shopping_list",
+        "title": "Shopping list",
+        "data": {},
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "onboarding",
+        "unique_id": "shopping_list",
+        "disabled_by": null
+      },
+      {
+        "entry_id": "f99c87f1c7a81a64f21afd6f20b43bc4",
+        "version": 1,
+        "minor_version": 1,
+        "domain": "google_translate",
+        "title": "Google Translate text-to-speech",
+        "data": {
+          "language": "en",
+          "tld": "com"
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "onboarding",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "c1bd562be345a8b5b2f7888d2cdd32aa",
+        "version": 1,
+        "minor_version": 1,
+        "domain": "radio_browser",
+        "title": "Radio Browser",
+        "data": {},
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "onboarding",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "52f0013d19aef2696842f6a05aedda3a",
+        "version": 1,
+        "minor_version": 1,
+        "domain": "met",
+        "title": "Home",
+        "data": {
+          "track_home": true
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "onboarding",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "f1eb94fe02740c48105facdf10dbb1e8",
+        "version": 1,
+        "minor_version": 1,
+        "domain": "plex",
+        "title": "https://172-16-18-3.8c55be1320a543929b43896c3d62db8d.plex.direct:32400",
+        "data": {
+          "server": "Docker",
+          "server_id": "2f77ca39c2753c55a1cc3bcbea27f91b5bc193d7",
+          "server_config": {
+            "url": "https://172-16-18-3.8c55be1320a543929b43896c3d62db8d.plex.direct:32400",
+            "client_id": "3a306bfc-8662-47af-b332-234383a1a432",
+            "token": "Qo6THSuS9uuXH98ATCFH",
+            "verify_ssl": true
+          }
+        },
+        "options": {
+          "media_player": {}
+        },
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "user",
+        "unique_id": "2f77ca39c2753c55a1cc3bcbea27f91b5bc193d7",
+        "disabled_by": null
+      },
+      {
+        "entry_id": "97866a6af1d54cc216c314eee73c6b7c",
+        "version": 1,
+        "minor_version": 1,
+        "domain": "homekit_controller",
+        "title": "Gladys F94D ( Bridge )",
+        "data": {
+          "AccessoryIP": "172.16.18.7",
+          "AccessoryIPs": [
+            "172.16.18.7"
+          ],
+          "AccessoryPort": 47129
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "ignore",
+        "unique_id": "a8:66:be:57:38:fa",
+        "disabled_by": null
+      },
+      {
+        "entry_id": "56a5e915608b92c4078b627a83cfdb48",
+        "version": 1,
+        "minor_version": 1,
+        "domain": "solarman",
+        "title": "192.168.1.100",
+        "data": {
+          "name": "Solarman",
+          "inverter_host": "192.168.1.100",
+          "inverter_serial": 2383196205,
+          "inverter_port": 8899,
+          "inverter_mb_slaveid": 1,
+          "lookup_file": "custom_parameters.yaml"
+        },
+        "options": {
+          "name": "Solarman",
+          "inverter_host": "192.168.1.100",
+          "inverter_serial": 2383196205,
+          "inverter_port": 8899,
+          "inverter_mb_slaveid": 1,
+          "lookup_file": "deye_string.yaml"
+        },
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "user",
+        "unique_id": null,
+        "disabled_by": "user"
+      },
+      {
+        "entry_id": "229d8b3305430866d2d123f55981b9c2",
+        "version": 2,
+        "minor_version": 1,
+        "domain": "forecast_solar",
+        "title": "Casa",
+        "data": {
+          "latitude": -20.479428,
+          "longitude": -54.5736051
+        },
+        "options": {
+          "azimuth": 180,
+          "declination": 25,
+          "modules_power": 1
+        },
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "user",
+        "unique_id": null,
+        "disabled_by": null
+      },
+      {
+        "entry_id": "7b62d9a91bd7e61f2d04481a215f0a3a",
+        "version": 1,
+        "minor_version": 1,
+        "domain": "mqtt",
+        "title": "192.168.1.113",
+        "data": {
+          "broker": "192.168.1.113",
+          "port": 1883,
+          "discovery": true,
+          "discovery_prefix": "deye",
+          "birth_message": {},
+          "will_message": {}
+        },
+        "options": {},
+        "pref_disable_new_entities": false,
+        "pref_disable_polling": false,
+        "source": "user",
+        "unique_id": null,
+        "disabled_by": null
+      }
+    ]
+  }
+}

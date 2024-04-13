@@ -1,0 +1,4 @@
+2024-04-13 20:38:59.709 WARNING (SyncWorker_0) [homeassistant.loader] We found a custom integration solarman which has not been tested by Home Assistant. This component might cause stability problems, be sure to disable it if you experience issues with Home Assistant
+2024-04-13 20:39:00.651 ERROR (MainThread) [homeassistant.config] Invalid config for 'mqtt' at configuration.yaml, line 33: 'energia' is an invalid option for 'mqtt', check: mqtt->0->energia, please check the docs at https://www.home-assistant.io/integrations/mqtt
+Invalid config for 'mqtt' at configuration.yaml, line 34: 'items' is an invalid option for 'mqtt', check: mqtt->0->items, please check the docs at https://www.home-assistant.io/integrations/mqtt
+2024-04-13 20:39:00.651 ERROR (MainThread) [homeassistant.setup] Setup failed for 'mqtt': Invalid config.

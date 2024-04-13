@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "minor_version": 5,
+  "key": "core.device_registry",
+  "data": {
+    "devices": [
+      {"area_id":null,"config_entries":["841871e74407d4e358bcab76873ecf6d"],"configuration_url":null,"connections":[],"disabled_by":null,"entry_type":"service","hw_version":null,"id":"ca7df27e3ed28bf1636a367e49a4c9f1","identifiers":[["sun","841871e74407d4e358bcab76873ecf6d"]],"labels":[],"manufacturer":null,"model":null,"name_by_user":null,"name":"Sun","serial_number":null,"sw_version":null,"via_device_id":null},
+      {"area_id":null,"config_entries":["52f0013d19aef2696842f6a05aedda3a"],"configuration_url":"https://www.met.no/en","connections":[],"disabled_by":null,"entry_type":"service","hw_version":null,"id":"4306a0b0ad7bf3292665543482be62df","identifiers":[["met","52f0013d19aef2696842f6a05aedda3a"]],"labels":[],"manufacturer":"Met.no","model":"Forecast","name_by_user":null,"name":"Forecast","serial_number":null,"sw_version":null,"via_device_id":null},
+      {"area_id":null,"config_entries":["f1eb94fe02740c48105facdf10dbb1e8"],"configuration_url":"https://172-16-18-3.8c55be1320a543929b43896c3d62db8d.plex.direct:32400/web","connections":[],"disabled_by":null,"entry_type":null,"hw_version":null,"id":"e518a724f46b95cb85d92d425362aae2","identifiers":[["plex","2f77ca39c2753c55a1cc3bcbea27f91b5bc193d7"]],"labels":[],"manufacturer":"Plex","model":"Plex Media Server","name_by_user":null,"name":"Docker","serial_number":null,"sw_version":"1.40.1.8227-c0dd5a73e","via_device_id":null},
+      {"area_id":null,"config_entries":["f1eb94fe02740c48105facdf10dbb1e8"],"configuration_url":null,"connections":[],"disabled_by":null,"entry_type":"service","hw_version":null,"id":"b9e7f9b7cfc96537ad665ad994628e58","identifiers":[["plex","plex.tv-clients"]],"labels":[],"manufacturer":"Plex","model":"Plex Clients","name_by_user":null,"name":"Plex Client Service","serial_number":null,"sw_version":null,"via_device_id":null},
+      {"area_id":null,"config_entries":["56a5e915608b92c4078b627a83cfdb48"],"configuration_url":null,"connections":[],"disabled_by":"config_entry","entry_type":null,"hw_version":null,"id":"445c90c12be905ae4b330f05b4b3033f","identifiers":[["solarman",2383196205]],"labels":[],"manufacturer":null,"model":"deye_string.yaml","name_by_user":null,"name":"Solarman","serial_number":null,"sw_version":null,"via_device_id":null},
+      {"area_id":null,"config_entries":["229d8b3305430866d2d123f55981b9c2"],"configuration_url":"https://forecast.solar","connections":[],"disabled_by":null,"entry_type":"service","hw_version":null,"id":"0240ad42cfc0d413716fe901a39dfe3e","identifiers":[["forecast_solar","229d8b3305430866d2d123f55981b9c2"]],"labels":[],"manufacturer":"Forecast.Solar","model":"public","name_by_user":null,"name":"Solar production forecast","serial_number":null,"sw_version":null,"via_device_id":null}
+    ],
+    "deleted_devices": [
+      {"config_entries":[],"connections":[],"identifiers":[["solarman",2206036085]],"id":"887c68aeaa1857080ee71be6857ee779","orphaned_timestamp":1712765419.8180401}
+    ]
+  }
+}

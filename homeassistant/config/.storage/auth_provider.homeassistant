@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "auth_provider.homeassistant",
+  "data": {
+    "users": [
+      {
+        "username": "sandim",
+        "password": "JDJiJDEyJGx5R0ttTTc2cVQ2bTY1Tkp2SDFNSmVSMHVvd2Y4Y2dhTGdMZ1RqUWJEYmN4c21WVGZXcjNx"
+      }
+    ]
+  }
+}

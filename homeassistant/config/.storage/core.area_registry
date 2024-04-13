@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "minor_version": 6,
+  "key": "core.area_registry",
+  "data": {
+    "areas": [
+      {
+        "aliases": [],
+        "floor_id": null,
+        "icon": null,
+        "id": "sala_de_estar",
+        "labels": [],
+        "name": "Sala de estar",
+        "picture": null
+      },
+      {
+        "aliases": [],
+        "floor_id": null,
+        "icon": null,
+        "id": "cozinha",
+        "labels": [],
+        "name": "Cozinha",
+        "picture": null
+      },
+      {
+        "aliases": [],
+        "floor_id": null,
+        "icon": null,
+        "id": "quarto",
+        "labels": [],
+        "name": "Quarto",
+        "picture": null
+      }
+    ]
+  }
+}

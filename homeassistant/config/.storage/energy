@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "energy",
+  "data": {
+    "energy_sources": [
+      {
+        "type": "grid",
+        "flow_from": [],
+        "flow_to": [
+          {
+            "stat_energy_to": "sensor.solarman_today_production",
+            "stat_compensation": null,
+            "entity_energy_price": null,
+            "number_energy_price": 0.88
+          }
+        ],
+        "cost_adjustment_day": 0.0
+      },
+      {
+        "type": "solar",
+        "stat_energy_from": "sensor.solarman_today_production",
+        "config_entry_solar_forecast": [
+          "229d8b3305430866d2d123f55981b9c2"
+        ]
+      }
+    ],
+    "device_consumption": []
+  }
+}
