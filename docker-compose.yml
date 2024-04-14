@@ -33,6 +33,8 @@ services:
       net_postgres:
         ipv4_address: 172.16.18.3
 
+  # ---------------------------------------------------------------------------
+
   # grafana:
   #   image: grafana/grafana
   #   container_name: grafana
@@ -108,64 +110,88 @@ services:
   
   # ---------------------------------------------------------------------------
 
-  netdata:
-    image: netdata/netdata:stable
-    container_name: Netdata
-    restart: unless-stopped
-    cap_add:
-      - SYS_PTRACE
-      - SYS_ADMIN
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - netdataconfig:/etc/netdata
-      - netdatalib:/var/lib/netdata
-      - netdatacache:/var/cache/netdata
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /etc/localtime:/etc/localtime:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /etc/os-release:/host/etc/os-release:ro
-      - /var/log:/host/var/log:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - 19999:19999
-    environment:
-      - NETDATA_CLAIM_TOKEN=1Qu-zs96oIWuxzmjn27EO9UKSJLKlx_6xKC0MDlYulb2TYd4PGiMePhxk9iva59bgvdKSpihUQg5m0LIyJFmPdhNCcBdzGjLObfV2ZAX8jLjx8A9N7jW9hYr8Ww0OwUBMxgvxIgVUac
-      - NETDATA_CLAIM_URL=https://app.netdata.cloud
-      - NETDATA_CLAIM_ROOMS=9fd3ad21-79c6-4962-bf79-24134328768d
-    networks:
-      net_postgres:
-        ipv4_address: 172.16.18.8
+  # netdata:
+  #   image: netdata/netdata:stable
+  #   container_name: Netdata
+  #   restart: unless-stopped
+  #   cap_add:
+  #     - SYS_PTRACE
+  #     - SYS_ADMIN
+  #   security_opt:
+  #     - apparmor:unconfined
+  #   volumes:
+  #     - /etc/passwd:/host/etc/passwd:ro
+  #     - /etc/group:/host/etc/group:ro
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /etc/os-release:/host/etc/os-release:ro
+  #     - /var/log:/host/var/log:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   ports:
+  #     - 19999:19999
+  #   environment:
+  #     - NETDATA_CLAIM_TOKEN=
+  #     - NETDATA_CLAIM_URL=https://app.netdata.cloud
+  #     - NETDATA_CLAIM_ROOMS=
+  #   networks:
+  #     net_postgres:
+  #       ipv4_address: 172.16.18.8
 
-  pihole:
-    container_name: pihole
-    image: pihole/pihole:latest
-    # For DHCP it is recommended to remove these ports and instead add: network_mode: "host"
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp" # Only required if you are using Pi-hole as your DHCP server
-      - "80:80/tcp"
-    environment:
-      TZ: 'America/Cuiaba'
-      # WEBPASSWORD: 'set a secure password here or it will be random'
-    # Volumes store your data between container upgrades
+  # ---------------------------------------------------------------------------
+
+  # pihole:
+  #   container_name: pihole
+  #   image: pihole/pihole:latest
+  #   # For DHCP it is recommended to remove these ports and instead add: network_mode: "host"
+  #   ports:
+  #     - "53:53/tcp"
+  #     - "53:53/udp"
+  #     - "67:67/udp" # Only required if you are using Pi-hole as your DHCP server
+  #     - "80:80/tcp"
+  #   environment:
+  #     TZ: 'America/Cuiaba'
+  #     # WEBPASSWORD: 'set a secure password here or it will be random'
+  #   # Volumes store your data between container upgrades
+  #   volumes:
+  #     - './etc-pihole:/etc/pihole'
+  #     - './etc-dnsmasq.d:/etc/dnsmasq.d'
+  #   #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+  #   cap_add:
+  #     - NET_ADMIN # Required if you are using Pi-hole as your DHCP server, else not needed
+  #   restart: unless-stopped
+  #   networks:
+  #     net_postgres:
+  #       ipv4_address: 172.16.18.9
+
+  # ---------------------------------------------------------------------------
+
+  deye-mqtt:
+    container_name: MQTT_MODBUS
+    image: ghcr.io/kbialek/deye-inverter-mqtt
     volumes:
-      - './etc-pihole:/etc/pihole'
-      - './etc-dnsmasq.d:/etc/dnsmasq.d'
-    #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
-    cap_add:
-      - NET_ADMIN # Required if you are using Pi-hole as your DHCP server, else not needed
-    restart: unless-stopped
+      - ./mqtt_modbus/:/mqtt_modbus/
+    env_file:
+      - ./mqtt_modbus/config.env
+  emqx:
+    container_name: EMQX
+    image: emqx:latest
+    environment:
+    - "EMQX_NAME=emqx"
+    - "EMQX_HOST=node1.emqx.io"
+    - "EMQX_CLUSTER__DISCOVERY_STRATEGY=static"
+    - "EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.io, emqx@node2.emqx.io]"
+    #default user/password: admin/public
+    ports:
+      - 1883:1883
+      - 8083:8083
+      - 8883:8883
+      - 14567:14567
+      - 8084:8084
+      - 18083:18083
     networks:
       net_postgres:
-        ipv4_address: 172.16.18.9
-volumes:
-  netdataconfig:
-  netdatalib:
-  netdatacache:
+        ipv4_address: 172.16.18.10
 
 networks:
   net_postgres:

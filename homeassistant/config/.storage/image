@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "image",
+  "data": {
+    "items": [
+      {
+        "id": "bd57cab10402584ecfa89899bec6f7cb",
+        "filesize": 173075,
+        "content_type": "image/jpeg",
+        "name": "casa.png",
+        "uploaded_at": "2024-04-14T18:52:59.163857+00:00"
+      }
+    ]
+  }
+}

@@ -30,6 +30,24 @@
         "labels": [],
         "name": "Quarto",
         "picture": null
+      },
+      {
+        "aliases": [],
+        "floor_id": null,
+        "icon": null,
+        "id": "attic",
+        "labels": [],
+        "name": "Attic",
+        "picture": null
+      },
+      {
+        "aliases": [],
+        "floor_id": null,
+        "icon": "mdi:home",
+        "id": "casa",
+        "labels": [],
+        "name": "Casa",
+        "picture": "/api/image/serve/bd57cab10402584ecfa89899bec6f7cb/512x512"
       }
     ]
   }

@@ -3,6 +3,35 @@
   "minor_version": 2,
   "key": "repairs.issue_registry",
   "data": {
-    "issues": []
+    "issues": [
+      {
+        "created": "2024-04-14T15:29:23.368092+00:00",
+        "dismissed_version": null,
+        "domain": "homeassistant",
+        "is_persistent": false,
+        "issue_id": "platform_integration_no_support_sensor_mqtt"
+      },
+      {
+        "created": "2024-04-14T15:45:56.199992+00:00",
+        "dismissed_version": "2024.4.2",
+        "domain": "mqtt",
+        "is_persistent": false,
+        "issue_id": "-0x2fcc231458ab184"
+      },
+      {
+        "created": "2024-04-14T15:45:56.200693+00:00",
+        "dismissed_version": null,
+        "domain": "mqtt",
+        "is_persistent": false,
+        "issue_id": "-0x6297a90bc2f60c8a"
+      },
+      {
+        "created": "2024-04-14T16:01:38.042053+00:00",
+        "dismissed_version": null,
+        "domain": "mqtt",
+        "is_persistent": false,
+        "issue_id": "0xbe2a9cd8de11ee1"
+      }
+    ]
   }
 }

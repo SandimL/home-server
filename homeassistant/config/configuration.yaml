@@ -11,60 +11,265 @@ script: !include scripts.yaml
 scene: !include scenes.yaml
 
 # Example configuration.yaml entry
-# sensor:
-  # - platform: netdata
-  #   host: "192.168.1.113"
-  #   port: "19999"
-  #   name: netdatahost
-  #   # resources:
-  #   #   system_load:
-  #   #     data_group: system.load
-  #   #     element: load15
-  #   #   system_cpu_utilization:
-  #   #     data_group: app.system_cpu_utilization
-  #   #     element: system
-  #   #   system_user_utilization:
-  #   #     data_group: app.system_cpu_utilization
-  #   #     element: user
-  #   #   mem_available:
-  #   #     data_group: mem.available
-  #   #     element: MemAvailable
 mqtt:
-  - energia:
-    items:
-        state_topic: deye/day_energy
-        resources:
-          data_group: energy_production
-          element: day_energy
+  sensor:
+  - name: "Status"
+    state_topic: "deye/status"
+    unique_id: status
+    qos: 0
+    force_update: true
+    icon: 'mdi:solar-power'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }    
 
-        # ,"deye/total_energy"
-        # ,"deye/ac/l1/voltage"
-        # ,"deye/ac/l1/current"
-        # ,"deye/ac/l1/power"
-        # ,"deye/ac/l2/voltage"
-        # ,"deye/ac/l2/current"
-        # ,"deye/ac/l2/power"
-        # ,"deye/ac/l3/voltage"
-        # ,"deye/ac/l3/current"
-        # ,"deye/ac/l3/power"
-        # ,"deye/ac/freq"
-        # ,"deye/uptime"
-        # ,"deye/dc/pv1/voltage"
-        # ,"deye/dc/pv1/current"
-        # ,"deye/dc/pv1/power"
-        # ,"deye/dc/pv2/voltage"
-        # ,"deye/dc/pv2/current"
-        # ,"deye/dc/pv2/power"
-        # ,"deye/dc/pv3/voltage"
-        # ,"deye/dc/pv3/current"
-        # ,"deye/dc/pv3/power"
-        # ,"deye/dc/pv4/voltage"
-        # ,"deye/dc/pv4/current"
-        # ,"deye/dc/pv4/power"
-        # ,"deye/dc/total_power"
-        # ,"deye/operating_power"
-        # ,"deye/ac/apparent_power"
-        # ,"deye/ac/active_power"
-        # ,"deye/ac/reactive_power"
-        # ,"deye/radiator_temp"
-        # ,"deye/igbt_temp"
+  - name: "Radiator Temperature"
+    state_topic: "deye/radiator_temp"
+    unique_id: ac/radiator_temp
+    qos: 0
+    force_update: true
+    unit_of_measurement: "°C"
+    icon: 'mdi:solar-power'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "Produção de energia hoje"
+    state_topic: "deye/day_energy"
+    state_class: total
+    device_class: energy
+    unique_id: day_energy
+    qos: 0
+    force_update: true
+    unit_of_measurement: "kWh"
+    icon: 'mdi:solar-power'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "Produção de energia total"
+    state_topic: "deye/total_energy"
+    state_class: total
+    device_class: energy
+    unique_id: total_energy
+    qos: 0
+    force_update: true
+    unit_of_measurement: "kWh"
+    icon: 'mdi:solar-power'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "Operating Power"
+    state_topic: "deye/operating_power"
+    unique_id: operating_power
+    qos: 0
+    force_update: true
+    unit_of_measurement: "W"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "AC - Power"
+    state_topic: "deye/ac/l1/power"
+    state_class: total
+    unique_id: ac/l1/power
+    qos: 0
+    force_update: true
+    unit_of_measurement: "W"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "AC - Aparent Power"
+    state_topic: "deye/ac/apparent_power"
+    unique_id: ac/apparent_power
+    qos: 0
+    force_update: true
+    unit_of_measurement: "W"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "AC - Active Power"
+    state_topic: "deye/ac/active_power"
+    unique_id: ac/active_power
+    qos: 0
+    force_update: true
+    unit_of_measurement: "W"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "AC - Reactive Power"
+    state_topic: "deye/ac/reactive_power"
+    unique_id: ac/reactive_power
+    qos: 0
+    force_update: true
+    unit_of_measurement: "W"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "AC - R(V)"
+    state_topic: "deye/ac/l1/voltage"
+    state_class: total
+    unique_id: ac/l1/voltage
+    qos: 0
+    force_update: true
+    unit_of_measurement: "V"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "AC - R(A)"
+    state_topic: "deye/ac/l1/current"
+    state_class: total
+    unique_id: ac/l1/current
+    qos: 0
+    force_update: true
+    unit_of_measurement: "A"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "AC - Frequência"
+    state_topic: "deye/ac/freq"
+    state_class: total
+    unique_id: ac/freq
+    qos: 0
+    force_update: true
+    unit_of_measurement: "Hz"
+    icon: 'mdi:solar-power'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "DC - Power 1"
+    state_topic: "deye/dc/pv1/power"
+    state_class: total
+    unique_id: dc/pv1/power
+    qos: 0
+    force_update: true
+    unit_of_measurement: "W"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "DC - PV1(V)"
+    state_topic: "deye/dc/pv1/voltage"
+    state_class: total
+    unique_id: dc/pv1/voltage
+    qos: 0
+    force_update: true
+    unit_of_measurement: "V"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "DC - PV1(A)"
+    state_topic: "deye/dc/pv1/current"
+    state_class: total
+    unique_id: dc/pv1/current
+    qos: 0
+    force_update: true
+    unit_of_measurement: "A"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "DC - Power 2"
+    state_topic: "deye/dc/pv2/power"
+    state_class: total
+    unique_id: dc/pv2/power
+    qos: 0
+    force_update: true
+    unit_of_measurement: "W"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "DC - PV2(V)"
+    state_topic: "deye/dc/pv2/voltage"
+    state_class: total
+    unique_id: dc/pv2/voltage
+    qos: 0
+    force_update: true
+    unit_of_measurement: "V"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "DC - PV2(A)"
+    state_topic: "deye/dc/pv2/current"
+    state_class: total
+    unique_id: dc/pv2/current
+    qos: 0
+    force_update: true
+    unit_of_measurement: "A"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }
+
+  - name: "DC - Total Power"
+    state_topic: "deye/dc/total_power"
+    state_class: total
+    unique_id: dc/total_power
+    qos: 0
+    force_update: true
+    unit_of_measurement: "W"
+    icon: 'mdi:home-lightning-bolt'
+    device: {
+      model: "DEYE SUN-4K-G",
+      identifiers: ["9"],
+      suggested_area: "Casa"
+    }

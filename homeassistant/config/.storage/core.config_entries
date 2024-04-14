@@ -153,27 +153,6 @@
         "disabled_by": "user"
       },
       {
-        "entry_id": "229d8b3305430866d2d123f55981b9c2",
-        "version": 2,
-        "minor_version": 1,
-        "domain": "forecast_solar",
-        "title": "Casa",
-        "data": {
-          "latitude": -20.479428,
-          "longitude": -54.5736051
-        },
-        "options": {
-          "azimuth": 180,
-          "declination": 25,
-          "modules_power": 1
-        },
-        "pref_disable_new_entities": false,
-        "pref_disable_polling": false,
-        "source": "user",
-        "unique_id": null,
-        "disabled_by": null
-      },
-      {
         "entry_id": "7b62d9a91bd7e61f2d04481a215f0a3a",
         "version": 1,
         "minor_version": 1,
@@ -184,8 +163,18 @@
           "port": 1883,
           "discovery": true,
           "discovery_prefix": "deye",
-          "birth_message": {},
-          "will_message": {}
+          "birth_message": {
+            "topic": "deye/status",
+            "payload": "online",
+            "qos": 0,
+            "retain": true
+          },
+          "will_message": {
+            "topic": "deye/status",
+            "payload": "offline",
+            "qos": 0,
+            "retain": true
+          }
         },
         "options": {},
         "pref_disable_new_entities": false,
