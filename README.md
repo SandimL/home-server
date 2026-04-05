@@ -1,74 +1,82 @@
 # Home server
 
-Stack Docker para um servidor em casa: multimídia, automação de downloads, broker MQTT, monitoramento, reverse proxy com TLS e exposição via Cloudflare Tunnel.
+Docker stack for a home server: media, download automation, MQTT broker, monitoring, TLS reverse proxy, and exposure via Cloudflare Tunnel.
 
-O [`docker-compose.yml`](./docker-compose.yml) pode usar `include` para mesclar **outro** arquivo Compose no mesmo host (caminho relativo). Serviços vindos desse include usam **variáveis e arquivos `.env` próprios daquele projeto** — consulte o YAML e a documentação do outro repositório.
+The [`docker-compose.yml`](./docker-compose.yml) may use `include` to merge **another** Compose file on the same host (relative path). Services from that include use **their own `.env` files and variables** — check the YAML and the other repository’s documentation.
 
-## Como subir
+## Getting started
 
 ```bash
-cd /mnt/homeserver   # ajuste para o caminho no seu host
+cd /mnt/homeserver   # adjust to the path on your host
 cp .env.example .env
 cp Caddyfile.example Caddyfile
-# Edite Caddyfile: email Let's Encrypt, IPs do host e domínios reais
+# Edit Caddyfile: Let's Encrypt email, host IPs, and real domains
 ```
 
-Preencha o **`.env`** deste diretório (Cloudflare Tunnel, EMQX, Plex claim, etc.). Se o `include` apontar para outro compose, crie/ajuste também o `.env` exigido por esse arquivo (ver `env_file` e variáveis no próprio YAML).
+Fill in **`.env`** in this directory (Cloudflare Tunnel, EMQX, Plex claim, etc.). If `include` points at another compose file, create or adjust the `.env` required by that file as well (see `env_file` and variables in that YAML).
 
 ```bash
 docker compose up -d
 ```
 
-O nome do projeto Compose é `mnt` (`name: mnt` no YAML), para manter redes e volumes estáveis. Os dados persistentes ficam em subpastas deste diretório (`plex/`, `emqx/`, …); elas estão no `.gitignore` e não vão para o Git.
+The Compose project name is `mnt` (`name: mnt` in the YAML) to keep networks and volumes stable. Persistent data lives in subfolders here (`plex/`, `emqx/`, …); they are listed in `.gitignore` and are not committed to Git.
 
-O **`Caddyfile` real também não é versionado** (evita expor no Git seu email ACME, IPs da LAN, domínios públicos e mapa dos serviços). No repositório existe só [`Caddyfile.example`](./Caddyfile.example) como modelo.
-
----
-
-## Rede
-
-- **`net_services`**: bridge `172.16.18.0/24`. A maioria dos **containers** tem IP fixo na faixa `172.16.18.x`.
-- **`network_mode: host`**: **Caddy**, **Cloudflare Tunnel** e **Plex** — conectam direto à pilha de rede do host (útil para descoberta DLNA/Plex e para o proxy escutar em todas as interfaces).
+The **real `Caddyfile` is not versioned** either (avoids publishing your ACME email, LAN IPs, public domains, and service map on Git). This repo only ships [`Caddyfile.example`](./Caddyfile.example) as a template.
 
 ---
 
-## Serviços descritos neste repositório
+## Networking
 
-| Serviço | Função | Portas / acesso típico |
-|---------|--------|-------------------------|
-| **Caddy** | Reverse proxy HTTPS, certificados automáticos, vários hosts `.lan` e domínios públicos | Arquivo `Caddyfile` (local; copie de [`Caddyfile.example`](./Caddyfile.example)); modo host |
-| **Cloudflare Tunnel** | Expõe serviços na internet sem abrir porta no roteador (token no `.env`) | Modo host |
-| **Plex** | Servidor de mídia | Modo host — interface em geral `http://<host>:32400` (rede local) |
-| **Netdata** | Monitoramento em tempo real: CPU, RAM, disco, rede, **containers Docker** (via `docker.sock` só leitura), logs do host | **`19999`** (ex.: `http://<host>:19999`) |
-| **Watchtower** | Atualização periódica de imagens Docker (intervalo 1 h) | Sem UI |
-| **EMQX** | **Broker MQTT** na rede local: recebe mensagens de sensores e publicadores, e entrega para assinantes (ex.: Home Assistant). Centraliza tópicos de telemetria. | **1883** (MQTT), **8083/8084** (WebSocket), **18083** (dashboard web) |
-| **deye-mqtt** | **Ponte** entre o **inversor solar Deye** (protocolo Modbus) e o MQTT: lê produção, bateria, consumo etc. no inversor e **publica tópicos** no EMQX. Configuração em `deye/config.env`. | Sem porta publicada — só fala com o broker na rede Docker |
-| **Radarr** | Gerenciamento de filmes para a biblioteca | **7878** |
-| **Prowlarr** | Indexadores para o ecossistema *arr* | **9696** |
-| **qBittorrent** | Cliente BitTorrent | **9090** (WebUI), **6881** TCP/UDP |
-
-Pastas de dados: `plex/` (config + media), `emqx/`, `deye/`, `radarr/`, `prowlarr/`, `qbittorrent/`, `downloads/` (compartilhada entre Radarr/qBittorrent), `caddy/data` e `caddy/config` (certificados e estado).
+- **`net_services`**: bridge `172.16.18.0/24`. Most **containers** use a static IP in `172.16.18.x`.
+- **`network_mode: host`**: **Caddy**, **Cloudflare Tunnel**, **Plex**, and **Netdata** attach directly to the host network stack (DLNA/Plex discovery, proxy on all interfaces, and full host visibility for monitoring).
 
 ---
 
-## O que dá para fazer com cada parte
+## Netdata
 
-- **Netdata**: painel único para a saúde do host e lista de **todos** os containers (CPU, memória, rede, restarts); alertas e plugins extras na documentação oficial do Netdata.
-- **Plex**: biblioteca com a pasta `plex/media` (compartilhada com o Radarr para importar filmes depois do download).
-- **Radarr + Prowlarr + qBittorrent**: fluxo típico — o Prowlarr alimenta indexadores, o Radarr gerencia filmes e envia downloads para `downloads/`, depois importa na biblioteca do Plex.
-- **Energia solar (deye-mqtt + EMQX)**: o **deye-mqtt** consulta o **inversor (placa solar / híbrido Deye)** e envia os dados para o **EMQX**. O **Home Assistant** (ou outro cliente MQTT na sua rede) **assina esses tópicos** e monta gráficos, automações e alertas de geração, consumo e bateria. O EMQX é o “hub” de mensagens; o deye-mqtt é só quem traduz o inversor para MQTT.
-- **Caddy**: um único ponto de entrada com TLS para serviços internos (ex. `*.lan`) e, se configurado, sites públicos atrás do Cloudflare Tunnel.
-- **Watchtower**: mantém imagens atualizadas; vale revisar os logs se algum serviço precisar de **versão fixa** da imagem.
+The stack runs **Netdata** in **host network mode** with the mounts recommended in the [official Docker guide](https://learn.netdata.cloud/docs/installing/docker): host `/proc`, `/sys`, read-only root (`/`), `docker.sock`, logs, and D-Bus where available. The UI listens on the host at **`http://<host>:19999`**. Configuration and cache use Docker **named volumes** (`netdataconfig`, `netdatalib`, `netdatacache`) — they are not bind-mounted under this repo.
+
+For **HTTPS** on the LAN, configure **`netdata.lan`** in your local **`Caddyfile`** with the same upstream IP as your other services (e.g. `http://<host>:19999`) plus **`tls internal`** — trust Caddy’s local CA on your devices (or accept the browser warning). On the same Docker host you can use **`127.0.0.1:19999`** instead of the LAN IP if you prefer loopback. [`Caddyfile.example`](./Caddyfile.example) uses a placeholder. Plain HTTP stays at `http://<host>:19999` without the proxy.
 
 ---
 
-## Documentação externa
+## Services in this repository
 
-- [Netdata](https://www.netdata.cloud/) · [Plex](https://support.plex.tv/) · [EMQX](https://www.emqx.io/docs) · [Home Assistant — MQTT](https://www.home-assistant.io/integrations/mqtt/)  
+| Service | Role | Ports / typical access |
+|---------|------|-------------------------|
+| **Caddy** | HTTPS reverse proxy, automatic certificates, multiple `.lan` hosts and public domains | Local `Caddyfile` (copy from [`Caddyfile.example`](./Caddyfile.example)); host mode |
+| **Cloudflare Tunnel** | Exposes services on the internet without opening ports on the router (token in `.env`) | Host mode |
+| **Plex** | Media server | Host mode — UI usually at `http://<host>:32400` (LAN) |
+| **Netdata** | Real-time monitoring: CPU, RAM, disk, network, **Docker containers** (read-only `docker.sock`), host logs | **Host network** — `http://<host>:19999` or **HTTPS** via Caddy (e.g. `https://netdata.lan`) |
+| **Watchtower** | Periodic Docker image updates (1 h interval) | No UI |
+| **EMQX** | **MQTT broker** on the LAN: ingests messages from sensors and publishers and delivers them to subscribers (e.g. Home Assistant). Central place for telemetry topics. | **1883** (MQTT), **8083/8084** (WebSocket), **18083** (web dashboard) |
+| **deye-mqtt** | **Bridge** between a **Deye solar inverter** (Modbus) and MQTT: reads production, battery, consumption, etc., and **publishes topics** to EMQX. Config in `deye/config.env`. | No published host port — only talks to the broker on the Docker network |
+| **Radarr** | Movie library management | **7878** |
+| **Prowlarr** | Indexer manager for the *arr* stack | **9696** |
+| **qBittorrent** | BitTorrent client | **9090** (WebUI), **6881** TCP/UDP |
+
+Data directories: `plex/` (config + media), `emqx/`, `deye/`, `radarr/`, `prowlarr/`, `qbittorrent/`, `downloads/` (shared by Radarr/qBittorrent), `caddy/data` and `caddy/config` (certificates and state).
+
+---
+
+## What each piece is for
+
+- **Netdata**: single dashboard for host health and **all** containers (CPU, memory, network, restarts); alerts and extra plugins in Netdata’s docs.
+- **Plex**: library using `plex/media` (shared with Radarr to import movies after download).
+- **Radarr + Prowlarr + qBittorrent**: typical flow — Prowlarr feeds indexers, Radarr manages movies and sends downloads to `downloads/`, then imports into the Plex library.
+- **Solar (deye-mqtt + EMQX)**: **deye-mqtt** polls the **Deye inverter (solar / hybrid)** and sends data to **EMQX**. **Home Assistant** (or another MQTT client on your LAN) **subscribes to those topics** for charts, automations, and alerts on generation, consumption, and battery. EMQX is the message hub; deye-mqtt translates the inverter to MQTT.
+- **Caddy**: one TLS entry point for internal services (e.g. `*.lan`) and, if configured, public sites behind Cloudflare Tunnel.
+- **Watchtower**: keeps images up to date; check logs if a service should **pin** a specific image version.
+
+---
+
+## External documentation
+
+- [Netdata](https://www.netdata.cloud/) · [Netdata on Docker](https://learn.netdata.cloud/docs/installing/docker) · [Plex](https://support.plex.tv/) · [EMQX](https://www.emqx.io/docs) · [Home Assistant — MQTT](https://www.home-assistant.io/integrations/mqtt/)  
 - [LinuxServer Radarr / Prowlarr / qBittorrent](https://docs.linuxserver.io/) · [Caddy](https://caddyserver.com/docs/) · [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)
 
 ---
 
-## Licença
+## License
 
-Configuração pessoal / privada; as imagens Docker seguem as licenças dos respectivos projetos.
+Personal / private configuration; Docker images follow their respective upstream licenses.

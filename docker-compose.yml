@@ -31,9 +31,13 @@ services:
         ipv4_address: 172.16.18.3
     restart: unless-stopped
 
+  # Full host-style metrics (see https://learn.netdata.cloud/docs/installing/docker )
+  # Uses host network so go.d, cgroups, and proc plugins match upstream recommendations.
   netdata:
     image: netdata/netdata:stable
     container_name: netdata
+    pid: host
+    network_mode: host
     restart: unless-stopped
     cap_add:
       - SYS_PTRACE
@@ -41,6 +45,10 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
+      - netdataconfig:/etc/netdata
+      - netdatalib:/var/lib/netdata
+      - netdatacache:/var/cache/netdata
+      - /:/host/root:ro,rslave
       - /etc/passwd:/host/etc/passwd:ro
       - /etc/group:/host/etc/group:ro
       - /etc/localtime:/etc/localtime:ro
@@ -49,11 +57,7 @@ services:
       - /etc/os-release:/host/etc/os-release:ro
       - /var/log:/host/var/log:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    ports:
-      - 19999:19999
-    networks:
-      net_services:
-        ipv4_address: 172.16.18.8
+      - /run/dbus:/run/dbus:ro
 
   emqx:
     container_name: emqx
@@ -142,8 +146,14 @@ services:
     restart: unless-stopped
 
   caddy:
-    image: caddy:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    image: caddy-cloudflare:local
     container_name: caddy_reverse_proxy
+    environment:
+      # Let's Encrypt wildcard *.jeronimofestas.com (DNS-01). Ver .env.example
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./caddy/data:/data
@@ -166,3 +176,8 @@ networks:
     ipam:
       config:
         - subnet: 172.16.18.0/24
+
+volumes:
+  netdataconfig:
+  netdatalib:
+  netdatacache:

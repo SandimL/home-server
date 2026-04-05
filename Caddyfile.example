@@ -2,69 +2,89 @@
 # cp Caddyfile.example Caddyfile
 #
 # O arquivo Caddyfile real não deve ser commitado (está no .gitignore).
+#
+# *.lan: use tls internal para https://nome.lan (Let's Encrypt não cobre .lan).
+# Domínio público (seudominio.com): mantém TLS automático (Let's Encrypt) sem tls internal.
 
 {
-    email seu-email@exemplo.com
+	email seu-email@exemplo.com
 }
 
-# --- Proxy reverso na LAN (substitua IP_DO_SERVIDOR pelo IP do host Docker) ---
+# --- Proxy reverso na LAN (substitua IP_DO_SERVIDOR / IP_OUTRO_HOST) ---
 
 plex.lan {
-    reverse_proxy IP_DO_SERVIDOR:32400
+	tls internal
+	reverse_proxy IP_DO_SERVIDOR:32400
 }
 
 radarr.lan {
-    reverse_proxy IP_DO_SERVIDOR:7878
+	tls internal
+	reverse_proxy IP_DO_SERVIDOR:7878
 }
 
 qbittorrent.lan {
-    reverse_proxy IP_DO_SERVIDOR:9090
+	tls internal
+	reverse_proxy IP_DO_SERVIDOR:9090
 }
 
 netdata.lan {
-    reverse_proxy IP_DO_SERVIDOR:19999
+	tls internal
+	reverse_proxy IP_DO_SERVIDOR:19999
 }
 
 emqx.lan {
-    reverse_proxy IP_DO_SERVIDOR:18083
+	tls internal
+	reverse_proxy IP_DO_SERVIDOR:18083
 }
 
+# Portainer: backend HTTPS na 9443 (cert próprio)
 portainer.lan {
-    reverse_proxy IP_DO_SERVIDOR:9443
+	tls internal
+	reverse_proxy https://IP_DO_SERVIDOR:9443 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
 }
 
 darubo.lan {
-    reverse_proxy IP_DO_SERVIDOR:8000
+	tls internal
+	reverse_proxy IP_DO_SERVIDOR:8000
 }
 
+# Proxmox: UI em HTTPS na 8006
 proxmox.lan {
-    reverse_proxy IP_OUTRO_HOST:8006
+	tls internal
+	reverse_proxy https://IP_OUTRO_HOST:8006 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
 }
 
 ha.lan {
-    reverse_proxy IP_OUTRO_HOST:8123
+	tls internal
+	reverse_proxy IP_OUTRO_HOST:8123
 }
 
 # --- Site público (ex.: frontend na porta publicada do Docker) ---
 
 seudominio.com {
-    reverse_proxy IP_DO_SERVIDOR:5173 {
-        header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto https
-    }
-    header {
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "DENY"
-        X-XSS-Protection "1; mode=block"
-        Referrer-Policy "strict-origin-when-cross-origin"
-    }
+	reverse_proxy IP_DO_SERVIDOR:5173
+
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
 }
 
 # HTTP em porta alternativa (ex.: acesso por IP público sem hostname)
 :8080 {
-    reverse_proxy IP_DO_SERVIDOR:5173
-    header {
-        X-Content-Type-Options "nosniff"
-    }
+	reverse_proxy IP_DO_SERVIDOR:5173
+
+	header {
+		X-Content-Type-Options "nosniff"
+	}
 }
