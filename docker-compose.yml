@@ -1,0 +1,168 @@
+name: mnt
+
+include:
+  - path: ../jeronimofestas/docker-compose.yml
+    env_file: ../jeronimofestas/.env
+
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: Plex
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - VERSION=docker
+      - PLEX_CLAIM=${PLEX_CLAIM}
+    volumes:
+      - /mnt/homeserver/plex/config:/config
+      - /mnt/homeserver/plex/media:/media
+    network_mode: host
+    restart: unless-stopped
+
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 3600
+    networks:
+      net_services:
+        ipv4_address: 172.16.18.3
+    restart: unless-stopped
+
+  netdata:
+    image: netdata/netdata:stable
+    container_name: netdata
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /var/log:/host/var/log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - 19999:19999
+    networks:
+      net_services:
+        ipv4_address: 172.16.18.8
+
+  emqx:
+    container_name: emqx
+    image: emqx/emqx:latest
+    environment:
+      - EMQX_NAME=emqx
+      - EMQX_NODE__NAME=emqx@127.0.0.1
+      - EMQX_DASHBOARD__DEFAULT_USERNAME=admin
+      - EMQX_DASHBOARD__DEFAULT_PASSWORD=${EMQX_DASHBOARD_PASSWORD}
+    ports:
+      - 1883:1883
+      - 8083:8083
+      - 8084:8084
+      - 18083:18083
+    volumes:
+      - /mnt/homeserver/emqx:/opt/emqx/data
+    networks:
+      net_services:
+        ipv4_address: 172.16.18.10
+    restart: unless-stopped
+
+  deye-mqtt:
+    container_name: deye-mqtt
+    image: ghcr.io/kbialek/deye-inverter-mqtt
+    volumes:
+      - /mnt/homeserver/deye:/mqtt_modbus
+    env_file:
+      - /mnt/homeserver/deye/config.env
+    networks:
+      net_services:
+        ipv4_address: 172.16.18.11
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /mnt/homeserver/radarr:/config
+      - /mnt/homeserver/plex/media:/media
+      - /mnt/homeserver/downloads:/downloads
+    ports:
+      - 7878:7878
+    networks:
+      net_services:
+        ipv4_address: 172.16.18.13
+    restart: unless-stopped
+
+  prowlarr:
+    image: linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /mnt/homeserver/prowlarr:/config
+    ports:
+      - 9696:9696
+    networks:
+      net_services:
+        ipv4_address: 172.16.18.14
+    restart: unless-stopped
+
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - WEBUI_PORT=9090
+    volumes:
+      - /mnt/homeserver/qbittorrent:/config
+      - /mnt/homeserver/downloads:/downloads
+    ports:
+      - 9090:9090
+      - 6881:6881
+      - 6881:6881/udp
+    networks:
+      net_services:
+        ipv4_address: 172.16.18.15
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy_reverse_proxy
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    network_mode: host
+    restart: unless-stopped
+
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    restart: unless-stopped
+    network_mode: host
+
+networks:
+  net_services:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.18.0/24

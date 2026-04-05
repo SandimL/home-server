@@ -1,0 +1,78 @@
+{
+    email sandim3012@gmail.com
+}
+# ===========================
+# Reverse Proxy dos Serviços
+# ===========================
+
+plex.lan {
+    reverse_proxy 192.169.0.231:32400
+}
+
+radarr.lan {
+    reverse_proxy 192.169.0.231:7878
+}
+
+qbittorrent.lan {
+    reverse_proxy 192.169.0.231:9090
+}
+
+netdata.lan {
+    reverse_proxy 192.169.0.231:19999
+}
+
+emqx.lan {
+    reverse_proxy 192.169.0.231:18083
+}
+
+portainer.lan {
+    reverse_proxy 192.169.0.231:9443
+}
+
+# Darubo - Agente de IA (chat UI: /static/chat.html, docs: /docs, health: /health)
+darubo.lan {
+    reverse_proxy 192.169.0.231:8000
+}
+
+proxmox.lan {
+    reverse_proxy 192.169.0.50:8006
+}
+
+ha.lan {
+    reverse_proxy 192.169.0.131:8123
+}
+
+# ===========================
+# Frontend Jeronimo Festas
+# ===========================
+
+# Acesso por domínio (com Cloudflare Proxy)
+# Cloudflare fornece SSL, então o Caddy aceita apenas HTTP
+# Para obter certificado: desligue o proxy no Cloudflare temporariamente
+jeronimofestas.com {
+    reverse_proxy 192.169.0.231:5173 {
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto https
+    }
+    
+    # Headers de segurança
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+
+# Acesso direto por IP na porta 8080 (HTTP)
+# Permite acesso por: http://132.255.242.160:8080
+:8080 {
+    reverse_proxy 192.169.0.231:5173
+    
+    # Headers básicos de segurança
+    header {
+        X-Content-Type-Options "nosniff"
+    }
+}
+

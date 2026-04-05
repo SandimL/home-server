@@ -1,0 +1,17 @@
+# Segredos e ambiente local
+.env
+.env.*
+!.env.example
+
+# Dados de serviços (bind mounts — não versionar)
+plex/
+emqx/
+deye/
+downloads/
+radarr/
+prowlarr/
+qbittorrent/
+
+# Caddy: certificados e estado local
+caddy/data/
+caddy/config/
