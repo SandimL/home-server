@@ -15,3 +15,6 @@ qbittorrent/
 # Caddy: certificados e estado local
 caddy/data/
 caddy/config/
+
+# Caddy: não versionar (IPs, domínios, email)
+Caddyfile
