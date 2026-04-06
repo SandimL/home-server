@@ -3,6 +3,12 @@
 #
 # O arquivo Caddyfile real não deve ser commitado (está no .gitignore).
 #
+# Upstream no mesmo host que o Caddy (network_mode: host): use o IP LAN do
+# servidor no Docker (ex.: IP_DO_SERVIDOR), desde que as portas dos contentores
+# estejam publicadas em todas as interfaces no compose (formato "7878:7878").
+# Se no futuro restringir portas só a 127.0.0.1 no docker-compose, o upstream
+# tem de ser 127.0.0.1:PORT (o bind loopback não escuta no IP da Ethernet).
+#
 # *.lan: use tls internal para https://nome.lan (Let's Encrypt não cobre .lan).
 # Domínio público (seudominio.com): mantém TLS automático (Let's Encrypt) sem tls internal.
 
@@ -20,6 +26,11 @@ plex.lan {
 radarr.lan {
 	tls internal
 	reverse_proxy IP_DO_SERVIDOR:7878
+}
+
+prowlarr.lan {
+	tls internal
+	reverse_proxy IP_DO_SERVIDOR:9696
 }
 
 qbittorrent.lan {

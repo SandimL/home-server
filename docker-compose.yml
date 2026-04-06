@@ -146,14 +146,8 @@ services:
     restart: unless-stopped
 
   caddy:
-    build:
-      context: .
-      dockerfile: Dockerfile.caddy
-    image: caddy-cloudflare:local
+    image: caddy:latest
     container_name: caddy_reverse_proxy
-    environment:
-      # Let's Encrypt wildcard *.jeronimofestas.com (DNS-01). Ver .env.example
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_DNS_API_TOKEN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./caddy/data:/data

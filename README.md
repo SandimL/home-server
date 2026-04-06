@@ -13,7 +13,7 @@ cp Caddyfile.example Caddyfile
 # Edit Caddyfile: Let's Encrypt email, host IPs, and real domains
 ```
 
-Fill in **`.env`** in this directory (Cloudflare Tunnel, EMQX, Plex claim, etc.). If `include` points at another compose file, create or adjust the `.env` required by that file as well (see `env_file` and variables in that YAML).
+Fill in **`.env`** in this directory (Cloudflare Tunnel, EMQX, Plex claim, etc.). If `include` points at another compose file, create or adjust the `.env` required by that file as well (see `env_file` and variables in that YAML). For **Jerónimo Festas**, production requires **`CORS_ORIGINS`** (see that project’s `.env.example`).
 
 ```bash
 docker compose up -d
@@ -49,11 +49,11 @@ For **HTTPS** on the LAN, configure **`netdata.lan`** in your local **`Caddyfile
 | **Plex** | Media server | Host mode — UI usually at `http://<host>:32400` (LAN) |
 | **Netdata** | Real-time monitoring: CPU, RAM, disk, network, **Docker containers** (read-only `docker.sock`), host logs | **Host network** — `http://<host>:19999` or **HTTPS** via Caddy (e.g. `https://netdata.lan`) |
 | **Watchtower** | Periodic Docker image updates (1 h interval) | No UI |
-| **EMQX** | **MQTT broker** on the LAN: ingests messages from sensors and publishers and delivers them to subscribers (e.g. Home Assistant). Central place for telemetry topics. | **1883** (MQTT), **8083/8084** (WebSocket), **18083** (web dashboard) |
+| **EMQX** | **MQTT broker** on the LAN: ingests messages from sensors and publishers and delivers them to subscribers (e.g. Home Assistant). Central place for telemetry topics. | **1883** (MQTT), **8083/8084** (WebSocket), **18083** (web dashboard) on the host (prefer HTTPS via Caddy, e.g. `emqx.lan`) |
 | **deye-mqtt** | **Bridge** between a **Deye solar inverter** (Modbus) and MQTT: reads production, battery, consumption, etc., and **publishes topics** to EMQX. Config in `deye/config.env`. | No published host port — only talks to the broker on the Docker network |
-| **Radarr** | Movie library management | **7878** |
-| **Prowlarr** | Indexer manager for the *arr* stack | **9696** |
-| **qBittorrent** | BitTorrent client | **9090** (WebUI), **6881** TCP/UDP |
+| **Radarr** | Movie library management | **7878** on the host (HTTPS via Caddy recommended) |
+| **Prowlarr** | Indexer manager for the *arr* stack | **9696** on the host |
+| **qBittorrent** | BitTorrent client | **9090** (WebUI), **6881** TCP/UDP (P2P) on the host |
 
 Data directories: `plex/` (config + media), `emqx/`, `deye/`, `radarr/`, `prowlarr/`, `qbittorrent/`, `downloads/` (shared by Radarr/qBittorrent), `caddy/data` and `caddy/config` (certificates and state).
 
@@ -67,6 +67,14 @@ Data directories: `plex/` (config + media), `emqx/`, `deye/`, `radarr/`, `prowla
 - **Solar (deye-mqtt + EMQX)**: **deye-mqtt** polls the **Deye inverter (solar / hybrid)** and sends data to **EMQX**. **Home Assistant** (or another MQTT client on your LAN) **subscribes to those topics** for charts, automations, and alerts on generation, consumption, and battery. EMQX is the message hub; deye-mqtt translates the inverter to MQTT.
 - **Caddy**: one TLS entry point for internal services (e.g. `*.lan`) and, if configured, public sites behind Cloudflare Tunnel.
 - **Watchtower**: keeps images up to date; check logs if a service should **pin** a specific image version.
+
+---
+
+## Security notes (Watchtower, Netdata, Docker socket)
+
+- **Watchtower** mounts the **Docker socket** with full access. If its container or a malicious image were compromised, that can lead to **host takeover**. Mitigations: pin trusted image digests, restrict who can schedule stacks, or prefer **manual** image updates and disable Watchtower.
+- **Netdata** runs with **high capabilities** and a **read-only `docker.sock`** mount for container visibility. Keep **`19999`** (and the proxied `netdata.lan` URL) on a **trusted LAN** only; do not expose monitoring UIs to the internet without authentication.
+- **Service UIs** (Radarr, Prowlarr, qBittorrent Web, EMQX dashboard) are published on the **host**; use **HTTPS on `*.lan`** via Caddy as the main entry point. If you ever bind those ports to **127.0.0.1** only in Compose, set Caddy’s `reverse_proxy` upstream to **127.0.0.1**, not the LAN IP.
 
 ---
 
