@@ -7,13 +7,13 @@ The [`docker-compose.yml`](./docker-compose.yml) may use `include` to merge **an
 ## Getting started
 
 ```bash
-cd /mnt/homeserver   # adjust to the path on your host
+cd /path/to/homeserver   # your clone path on the host
 cp .env.example .env
 cp Caddyfile.example Caddyfile
-# Edit Caddyfile: Let's Encrypt email, host IPs, and real domains
+# Edit Caddyfile: Let's Encrypt email, LAN IPs, and real hostnames
 ```
 
-Fill in **`.env`** in this directory (Cloudflare Tunnel, EMQX, Plex claim, etc.). If `include` points at another compose file, create or adjust the `.env` required by that file as well (see `env_file` and variables in that YAML). For **Jerónimo Festas**, production requires **`CORS_ORIGINS`** (see that project’s `.env.example`).
+Fill in **`.env`** here (Cloudflare Tunnel token, EMQX dashboard password, Plex claim). This compose file **`include`s** [`../jeronimofestas/docker-compose.yml`](./docker-compose.yml) — that app reads **`../jeronimofestas/.env`** (not this file). Configure that file separately; for production, set **`CORS_ORIGINS`** there (see Jerônimo Festas `.env.example`).
 
 ```bash
 docker compose up -d

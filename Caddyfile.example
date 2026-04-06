@@ -1,57 +1,55 @@
-# Copiar para Caddyfile e ajustar IPs, domínios e email.
+# Copy to Caddyfile and set IPs, hostnames, and ACME email.
 # cp Caddyfile.example Caddyfile
 #
-# O arquivo Caddyfile real não deve ser commitado (está no .gitignore).
+# The real Caddyfile should not be committed (.gitignore).
 #
-# Upstream no mesmo host que o Caddy (network_mode: host): use o IP LAN do
-# servidor no Docker (ex.: IP_DO_SERVIDOR), desde que as portas dos contentores
-# estejam publicadas em todas as interfaces no compose (formato "7878:7878").
-# Se no futuro restringir portas só a 127.0.0.1 no docker-compose, o upstream
-# tem de ser 127.0.0.1:PORT (o bind loopback não escuta no IP da Ethernet).
+# Caddy uses network_mode: host. For services on the same machine, use this host’s
+# LAN IP (YOUR_SERVER_LAN_IP) if compose publishes ports on all interfaces (e.g. 7878:7878).
+# If you later bind services to 127.0.0.1 only, use 127.0.0.1:PORT as upstream.
 #
-# *.lan: use tls internal para https://nome.lan (Let's Encrypt não cobre .lan).
-# Domínio público (seudominio.com): mantém TLS automático (Let's Encrypt) sem tls internal.
+# *.lan: tls internal for https://name.lan (Let's Encrypt does not issue for .lan).
+# Public domains: default automatic HTTPS (Let's Encrypt) without tls internal.
 
 {
-	email seu-email@exemplo.com
+	email you@example.com
 }
 
-# --- Proxy reverso na LAN (substitua IP_DO_SERVIDOR / IP_OUTRO_HOST) ---
+# --- Reverse proxy on the LAN (replace YOUR_SERVER_LAN_IP / OTHER_HOST_IP) ---
 
 plex.lan {
 	tls internal
-	reverse_proxy IP_DO_SERVIDOR:32400
+	reverse_proxy YOUR_SERVER_LAN_IP:32400
 }
 
 radarr.lan {
 	tls internal
-	reverse_proxy IP_DO_SERVIDOR:7878
+	reverse_proxy YOUR_SERVER_LAN_IP:7878
 }
 
 prowlarr.lan {
 	tls internal
-	reverse_proxy IP_DO_SERVIDOR:9696
+	reverse_proxy YOUR_SERVER_LAN_IP:9696
 }
 
 qbittorrent.lan {
 	tls internal
-	reverse_proxy IP_DO_SERVIDOR:9090
+	reverse_proxy YOUR_SERVER_LAN_IP:9090
 }
 
 netdata.lan {
 	tls internal
-	reverse_proxy IP_DO_SERVIDOR:19999
+	reverse_proxy YOUR_SERVER_LAN_IP:19999
 }
 
 emqx.lan {
 	tls internal
-	reverse_proxy IP_DO_SERVIDOR:18083
+	reverse_proxy YOUR_SERVER_LAN_IP:18083
 }
 
-# Portainer: backend HTTPS na 9443 (cert próprio)
+# Portainer: HTTPS on 9443 (self-signed cert)
 portainer.lan {
 	tls internal
-	reverse_proxy https://IP_DO_SERVIDOR:9443 {
+	reverse_proxy https://YOUR_SERVER_LAN_IP:9443 {
 		transport http {
 			tls_insecure_skip_verify
 		}
@@ -60,13 +58,13 @@ portainer.lan {
 
 darubo.lan {
 	tls internal
-	reverse_proxy IP_DO_SERVIDOR:8000
+	reverse_proxy YOUR_SERVER_LAN_IP:8000
 }
 
-# Proxmox: UI em HTTPS na 8006
+# Proxmox: UI over HTTPS on 8006
 proxmox.lan {
 	tls internal
-	reverse_proxy https://IP_OUTRO_HOST:8006 {
+	reverse_proxy https://OTHER_HOST_IP:8006 {
 		transport http {
 			tls_insecure_skip_verify
 		}
@@ -75,13 +73,13 @@ proxmox.lan {
 
 ha.lan {
 	tls internal
-	reverse_proxy IP_OUTRO_HOST:8123
+	reverse_proxy OTHER_HOST_IP:8123
 }
 
-# --- Site público (ex.: frontend na porta publicada do Docker) ---
+# --- Public site (e.g. frontend on a published Docker port) ---
 
-seudominio.com {
-	reverse_proxy IP_DO_SERVIDOR:5173
+example.com {
+	reverse_proxy YOUR_SERVER_LAN_IP:5173
 
 	header {
 		X-Content-Type-Options "nosniff"
@@ -91,9 +89,9 @@ seudominio.com {
 	}
 }
 
-# HTTP em porta alternativa (ex.: acesso por IP público sem hostname)
+# Alternate HTTP port (e.g. access by public IP without a hostname)
 :8080 {
-	reverse_proxy IP_DO_SERVIDOR:5173
+	reverse_proxy YOUR_SERVER_LAN_IP:5173
 
 	header {
 		X-Content-Type-Options "nosniff"
