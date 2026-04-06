@@ -4,17 +4,24 @@
 !.env.example
 
 # Dados de serviços (bind mounts — não versionar)
+downloads/
 plex/
 emqx/
-deye/
-downloads/
 radarr/
 prowlarr/
 qbittorrent/
 
-# Caddy: certificados e estado local
-caddy/data/
-caddy/config/
+# Caddy: certificados, estado e Caddyfile ativo (compose monta só config/caddy/Caddyfile; use *.example versionados)
+config/caddy/data/
+config/caddy/config/
+config/caddy/Caddyfile
 
-# Caddy: não versionar (IPs, domínios, email)
-Caddyfile
+# Infra: Vault usa volume Docker; SOPS local (se usares)
+infra/secrets/*.enc.yaml
+infra/secrets/secrets.yaml
+!infra/secrets/*.example
+
+# Logs locais do Homepage (gerados em runtime)
+config/homepage/logs/
+
+*.backup

@@ -1,5 +1,11 @@
 name: mnt
 
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 include:
   - path: ../jeronimofestas/docker-compose.yml
     env_file: ../jeronimofestas/.env
@@ -15,10 +21,17 @@ services:
       - VERSION=docker
       - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
-      - /mnt/homeserver/plex/config:/config
-      - /mnt/homeserver/plex/media:/media
+      - ./plex/config:/config
+      - ./plex/media:/media
     network_mode: host
+    logging: *default-logging
     restart: unless-stopped
+    labels:
+      - homepage.group=Media
+      - homepage.name=Plex
+      - homepage.icon=plex.png
+      - homepage.href=https://plex.lan
+      - homepage.enabled=true
 
   watchtower:
     container_name: watchtower
@@ -27,17 +40,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 3600
     networks:
-      net_services:
-        ipv4_address: 172.16.18.3
+      - net_services
+    logging: *default-logging
     restart: unless-stopped
 
-  # Full host-style metrics (see https://learn.netdata.cloud/docs/installing/docker )
-  # Uses host network so go.d, cgroups, and proc plugins match upstream recommendations.
   netdata:
     image: netdata/netdata:stable
     container_name: netdata
     pid: host
     network_mode: host
+    logging: *default-logging
     restart: unless-stopped
     cap_add:
       - SYS_PTRACE
@@ -58,6 +70,12 @@ services:
       - /var/log:/host/var/log:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /run/dbus:/run/dbus:ro
+    labels:
+      - homepage.group=Monitoramento
+      - homepage.name=Netdata
+      - homepage.icon=netdata.png
+      - homepage.href=https://netdata.lan
+      - homepage.enabled=true
 
   emqx:
     container_name: emqx
@@ -68,28 +86,48 @@ services:
       - EMQX_DASHBOARD__DEFAULT_USERNAME=admin
       - EMQX_DASHBOARD__DEFAULT_PASSWORD=${EMQX_DASHBOARD_PASSWORD}
     ports:
-      - 1883:1883
-      - 8083:8083
-      - 8084:8084
-      - 18083:18083
+      - "1883:1883"
+      - "8083:8083"
+      - "8084:8084"
+      - "18083:18083"
     volumes:
-      - /mnt/homeserver/emqx:/opt/emqx/data
+      - ./emqx:/opt/emqx/data
     networks:
-      net_services:
-        ipv4_address: 172.16.18.10
+      - net_services
+    logging: *default-logging
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "emqx ping | grep -q pong || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    labels:
+      - homepage.group=IoT
+      - homepage.name=EMQX
+      - homepage.icon=emqx.png
+      - homepage.href=https://emqx.lan
+      - homepage.enabled=true
 
   deye-mqtt:
     container_name: deye-mqtt
     image: ghcr.io/kbialek/deye-inverter-mqtt
     volumes:
-      - /mnt/homeserver/deye:/mqtt_modbus
+      - ./deye:/mqtt_modbus
     env_file:
-      - /mnt/homeserver/deye/config.env
+      - ./deye/config.env
     networks:
-      net_services:
-        ipv4_address: 172.16.18.11
+      - net_services
+    logging: *default-logging
     restart: unless-stopped
+    labels:
+      - homepage.group=IoT
+      - homepage.name=Deye MQTT
+      - homepage.icon=mdi-solar-power
+      # Sem UI web própria; href obrigatório para o Homepage não rebentar (new URL). Atalho útil: dashboard MQTT.
+      - homepage.href=https://emqx.lan
+      - homepage.description=Ponte inversor → MQTT (UI no EMQX)
+      - homepage.enabled=true
 
   radarr:
     image: linuxserver/radarr:latest
@@ -99,15 +137,27 @@ services:
       - PGID=1000
       - TZ=America/Sao_Paulo
     volumes:
-      - /mnt/homeserver/radarr:/config
-      - /mnt/homeserver/plex/media:/media
-      - /mnt/homeserver/downloads:/downloads
+      - ./radarr:/config
+      - ./plex/media:/media
+      - ./downloads:/downloads
     ports:
-      - 7878:7878
+      - "7878:7878"
     networks:
-      net_services:
-        ipv4_address: 172.16.18.13
+      - net_services
+    logging: *default-logging
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:7878/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - homepage.group=Media
+      - homepage.name=Radarr
+      - homepage.icon=radarr.png
+      - homepage.href=https://radarr.lan
+      - homepage.enabled=true
 
   prowlarr:
     image: linuxserver/prowlarr:latest
@@ -117,13 +167,25 @@ services:
       - PGID=1000
       - TZ=America/Sao_Paulo
     volumes:
-      - /mnt/homeserver/prowlarr:/config
+      - ./prowlarr:/config
     ports:
-      - 9696:9696
+      - "9696:9696"
     networks:
-      net_services:
-        ipv4_address: 172.16.18.14
+      - net_services
+    logging: *default-logging
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9696/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - homepage.group=Media
+      - homepage.name=Prowlarr
+      - homepage.icon=prowlarr.png
+      - homepage.href=https://prowlarr.lan
+      - homepage.enabled=true
 
   qbittorrent:
     image: linuxserver/qbittorrent:latest
@@ -134,25 +196,101 @@ services:
       - TZ=America/Sao_Paulo
       - WEBUI_PORT=9090
     volumes:
-      - /mnt/homeserver/qbittorrent:/config
-      - /mnt/homeserver/downloads:/downloads
+      - ./qbittorrent:/config
+      - ./downloads:/downloads
     ports:
-      - 9090:9090
-      - 6881:6881
-      - 6881:6881/udp
+      - "9090:9090"
+      - "6881:6881"
+      - "6881:6881/udp"
     networks:
-      net_services:
-        ipv4_address: 172.16.18.15
+      - net_services
+    logging: *default-logging
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9090/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - homepage.group=Media
+      - homepage.name=qBittorrent
+      - homepage.icon=qbittorrent.png
+      - homepage.href=https://qbittorrent.lan
+      - homepage.enabled=true
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    environment:
+      # PUID/PGID 0: o processo Node fica root e consegue usar /var/run/docker.sock (doc oficial Homepage).
+      # Com 1000:1000 o su-exec perde o grupo docker — descoberta de contentores fica vazia.
+      - PUID=0
+      - PGID=0
+      - TZ=America/Sao_Paulo
+      - HOMEPAGE_ALLOWED_HOSTS=${HOMEPAGE_ALLOWED_HOSTS:-*}
+    volumes:
+      - ./config/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "3000:3000"
+    networks:
+      - net_services
+    logging: *default-logging
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - homepage.group=Infraestrutura
+      - homepage.name=Homepage
+      - homepage.icon=homepage.png
+      - homepage.href=https://homeserver.lan
+      - homepage.enabled=true
+
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: vault
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_API_ADDR: http://0.0.0.0:8200
+    volumes:
+      - ./infra/vault/config:/vault/config:ro
+      - vault_data:/vault/file
+    command: ["server", "-config=/vault/config/vault.hcl"]
+    ports:
+      - "127.0.0.1:8200:8200"
+    networks:
+      - net_services
+    logging: *default-logging
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    labels:
+      - homepage.group=Infraestrutura
+      - homepage.name=Vault
+      - homepage.icon=vault.png
+      - homepage.href=https://vault.lan
+      - homepage.description=KV secrets
+      - homepage.enabled=true
 
   caddy:
     image: caddy:latest
     container_name: caddy_reverse_proxy
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./caddy/data:/data
-      - ./caddy/config:/config
+      - ./config/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./config/caddy/data:/data
+      - ./config/caddy/config:/config
     network_mode: host
+    logging: *default-logging
     restart: unless-stopped
 
   cloudflare-tunnel:
@@ -161,6 +299,7 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    logging: *default-logging
     restart: unless-stopped
     network_mode: host
 
@@ -175,3 +314,4 @@ volumes:
   netdataconfig:
   netdatalib:
   netdatacache:
+  vault_data:

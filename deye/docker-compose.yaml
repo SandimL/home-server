@@ -1,0 +1,32 @@
+services:
+  deye-mqtt:
+    image: ghcr.io/kbialek/deye-inverter-mqtt
+    volumes:
+      - ./:src/
+    env_file:
+      - config.env
+  emqx:
+    image: emqx:latest
+    environment:
+    - "EMQX_NAME=emqx"
+    - "EMQX_HOST=node1.emqx.io"
+    - "EMQX_CLUSTER__DISCOVERY_STRATEGY=static"
+    - "EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.io, emqx@node2.emqx.io]"
+    ports:
+      - 1883:1883
+      - 8083:8083
+      - 8883:8883
+      - 14567:14567
+      - 8084:8084
+      - 18083:18083
+    networks:
+      net_postgres:
+        ipv4_address: 172.16.20.10
+    
+networks:
+  net_postgres:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.20.0/24

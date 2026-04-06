@@ -1,0 +1,4 @@
+---
+# Descoberta via Docker socket (containers com labels homepage.* no compose)
+local-docker:
+  socket: /var/run/docker.sock

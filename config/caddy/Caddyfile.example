@@ -1,0 +1,123 @@
+# Copie para config/caddy/Caddyfile (o compose monta esse caminho).
+# cp config/caddy/Caddyfile.example config/caddy/Caddyfile
+#
+# Caddy usa network_mode: host. Nesse modo o Caddy NÃO resolve nomes DNS internos do Docker
+# (ex.: radarr:7878). Para serviços com portas publicadas neste host, use 127.0.0.1:PORT.
+# Serviços em outras máquinas continuam com o IP LAN real.
+#
+# *.lan: tls internal (Let's Encrypt não emite para .lan).
+
+{
+	email you@example.com
+}
+
+(lan_headers) {
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}
+
+plex.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy 127.0.0.1:32400
+}
+
+radarr.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy 127.0.0.1:7878
+}
+
+prowlarr.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy 127.0.0.1:9696
+}
+
+qbittorrent.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy 127.0.0.1:9090
+}
+
+netdata.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy 127.0.0.1:19999
+}
+
+emqx.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy 127.0.0.1:18083
+}
+
+homeserver.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy 127.0.0.1:3000
+}
+
+vault.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy 127.0.0.1:8200
+}
+
+portainer.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy https://YOUR_SERVER_LAN_IP:9443 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+}
+
+darubo.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy YOUR_SERVER_LAN_IP:8000
+}
+
+proxmox.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy https://OTHER_HOST_IP:8006 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+}
+
+ha.lan {
+	import lan_headers
+	tls internal
+	reverse_proxy OTHER_HOST_IP:8123
+}
+
+# Domínio público: com Cloudflare proxy (laranja), o ACME HTTP-01/TLS-ALPN-01 costuma falhar até o tráfego
+# HTTP chegar ao Caddy no teu IP de origem.
+
+example.com {
+	reverse_proxy 127.0.0.1:5173
+
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}
+
+:8080 {
+	reverse_proxy 127.0.0.1:5173
+
+	header {
+		X-Content-Type-Options "nosniff"
+	}
+}
