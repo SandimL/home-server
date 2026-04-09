@@ -15,7 +15,7 @@ cp config/caddy/Caddyfile.example config/caddy/Caddyfile
 # deye: copia/cria deye/config.env a partir do que precisares para o inversor
 ```
 
-Fill in **`.env`** here (Cloudflare Tunnel token, EMQX dashboard password, Plex claim). This compose file **`include`s** [`../jeronimofestas/docker-compose.yml`](./docker-compose.yml) — that app reads **`../jeronimofestas/.env`** (not this file). Configure that file separately; for production, set **`CORS_ORIGINS`** there (see Jerônimo Festas `.env.example`).
+Fill in **`.env`** here (Cloudflare Tunnel token, EMQX dashboard password, Plex claim). This compose file **`include`s** [`../jeronimofestas/docker-compose.yml`](./docker-compose.yml) — 
 
 ```bash
 docker compose up -d
